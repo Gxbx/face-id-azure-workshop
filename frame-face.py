@@ -13,25 +13,23 @@ from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
 from azure.cognitiveservices.vision.face.models import TrainingStatusType, Person, SnapshotObjectType, OperationStatusType
 
-# Set the FACE_SUBSCRIPTION_KEY environment variable with your key as the value.
-# This key will serve all examples in this document.
-KEY = os.environ['FACE_SUBSCRIPTION_KEY']
+#API Key del servicio de Azure, se puede obtener en el portal de Azure
+KEY = 'API_KEY'
 
-# Set the FACE_ENDPOINT environment variable with the endpoint from your Face service in Azure.
-# This endpoint will be used in all examples in this quickstart.
-ENDPOINT = os.environ['FACE_ENDPOINT']
+# Endpoint de la conexión, se puede obtener en el portal de Azure
+ENDPOINT = 'FACE_ENDPOINT'
 
-# Create an authenticated FaceClient.
+# Crea un cliente usando los datos suministrados para el FaceClient.
 face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
 
-# Detect a face in an image that contains a single face
-single_face_image_url = 'https://raw.githubusercontent.com/Microsoft/Cognitive-Face-Windows/master/Data/detection1.jpg'
+# Detecta una cara en una imagen que contiene una sola cara
+single_face_image_url = 'https://pbs.twimg.com/profile_images/1019274579540430848/F1TZagiu.jpg'
 single_image_name = os.path.basename(single_face_image_url)
 detected_faces = face_client.face.detect_with_url(url=single_face_image_url)
 if not detected_faces:
     raise Exception('No face detected from image {}'.format(single_image_name))
 
-# Convert width height to a point in a rectangle
+# Convierte los puntos en un rectangulo
 def getRectangle(faceDictionary):
     rect = faceDictionary.face_rectangle
     left = rect.left
@@ -42,15 +40,15 @@ def getRectangle(faceDictionary):
     return ((left, top), (right, bottom))
 
 
-# Download the image from the url
+# Descarga la imagen de la url
 response = requests.get(single_face_image_url)
 img = Image.open(BytesIO(response.content))
 
-# For each face returned use the face rectangle and draw a red box.
+# Para cada cara dibuja un rectangulo rojo
 print('Drawing rectangle around face... see popup for results.')
 draw = ImageDraw.Draw(img)
 for face in detected_faces:
     draw.rectangle(getRectangle(face), outline='red')
 
-# Display the image in the users default image browser.
+# Muestra la imagen en un pop-up
 img.show()
